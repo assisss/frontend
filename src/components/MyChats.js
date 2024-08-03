@@ -4,10 +4,17 @@ import { ChatState } from '../context/chatProvider';
 import ChatLoading from './ChatLoading';
 import { getSender } from '../config/ChatLogics';
 import GroupChatModal from './miscellaneous/GroupChatModal';
+import {
+  Box,
+  Flex,
+  Button,
+  Text,
+  VStack,
+  useDisclosure,
+} from '@chakra-ui/react';
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
-
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
   const fetchChats = async () => {
@@ -17,8 +24,7 @@ const MyChats = ({ fetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         }
       }
-      const { data } = await axios.get("api/chat", config);
-
+      const { data } = await axios.get("/api/chat", config);
       setChats(data);
     } catch (error) {
       console.error("Failed to Load the chats", error);
@@ -31,58 +37,78 @@ const MyChats = ({ fetchAgain }) => {
   }, [fetchAgain]);
 
   return (
-    <>
-    <div
-      className={`${
-        selectedChat ? 'hidden' : 'flex'
-      } md:flex flex-col items-end p-3 bg-white w-full rounded-lg border border-gray-300`}
+    <Flex
+      direction="column"
+      h="full"
+      bg="black"
+      color="white"
+      borderWidth="1px"
+      borderColor="gray.700"
+      borderRadius="md"
     >
-      <div
-        className="pb-3 px-3 text-2xl md:text-3xl font-semibold w-full flex justify-between items-center border-b border-gray-300"
+      <Flex
+        direction="row"
+        align="center"
+        justify="space-between"
+        p="3"
+        borderBottomWidth="1px"
+        borderBottomColor="gray.700"
+        bg="black"
       >
-        My Chats
-
+        <Text fontSize="2xl" fontWeight="semibold">
+          My Chats
+        </Text>
         <GroupChatModal>
-          <button
-            className="flex items-center text-lg md:text-sm lg:text-lg text-white bg-teal-500 hover:bg-teal-600 rounded px-3 py-2"
+          <Button
+            colorScheme="teal"
+            variant="solid"
+            size="sm"
+            _hover={{ bg: "teal.600" }}
           >
             New Group Chat
-          </button>
+          </Button>
         </GroupChatModal>
-      </div>
-    </div>
+      </Flex>
 
-      <div className="flex flex-col p-3 bg-gray-100 w-full flex-grow rounded-lg overflow-y-hidden">
+      <Flex
+        direction="column"
+        p="3"
+        bg="gray.800"
+        flex="1"
+        overflowY="auto"
+      >
         {chats ? (
-          <div className="overflow-y-auto space-y-3">
+          <VStack spacing={3} align="stretch">
             {chats.map((chat) => (
-              <div
-                onClick={() => setSelectedChat(chat)}
-                className={`cursor-pointer px-3 py-2 rounded-lg ${
-                  selectedChat === chat
-                    ? 'bg-teal-500 text-white'
-                    : 'bg-gray-200 text-black'
-                } hover:bg-teal-500 hover:text-white transition-colors duration-300 ease-in-out`}
+              <Box
                 key={chat._id}
+                onClick={() => setSelectedChat(chat)}
+                p="3"
+                borderRadius="md"
+                bg={selectedChat === chat ? "teal.500" : "gray.700"}
+                color={selectedChat === chat ? "white" : "gray.200"}
+                _hover={{ bg: "teal.600", color: "white" }}
+                cursor="pointer"
+                transition="background-color 0.3s ease-in-out"
               >
-                <div className="text-md font-bold">
+                <Text fontSize="md" fontWeight="bold">
                   {!chat.isGroupChat ? getSender(loggedUser, chat.users) : chat.chatName}
-                </div>
+                </Text>
                 {chat.latestMessage && (
-                  <div className="text-sm text-gray-500">
+                  <Text fontSize="sm" color="gray.400">
                     {chat.latestMessage.content.length > 50
                       ? chat.latestMessage.content.substring(0, 51) + "..."
                       : chat.latestMessage.content}
-                  </div>
+                  </Text>
                 )}
-              </div>
+              </Box>
             ))}
-          </div>
+          </VStack>
         ) : (
           <ChatLoading />
         )}
-      </div>
-    </>
+      </Flex>
+    </Flex>
   );
 }
 

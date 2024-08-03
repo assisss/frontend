@@ -1,0 +1,42 @@
+.typing {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 0.15em solid orange;
+    animation: typingFirst 4s steps(30, end), blink-caret 0.75s step-end infinite;
+  }
+  
+  .typing::after {
+    content: '';
+    display: inline-block;
+    animation: typingSecond 4s steps(30, end) forwards, blink-caret 0.75s step-end infinite 4s;
+    white-space: pre; /* Keep the newline in place */
+  }
+  
+  @keyframes typingFirst {
+    from { width: 0 }
+    to { width: 100% }
+  }
+  
+  @keyframes typingSecond {
+    from { content: ''; }
+    to { content: ' Connect with your loved ones easily!'; }
+  }
+  
+  @keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: orange }
+  }
+  
+  .hoverButton {
+    background-color: black;
+    color: white; /* Ensure the text color is white */
+    border: 2px solid white;
+    transition: all 0.3s ease;
+  }
+  
+  .hoverButton:hover {
+    background-color: white;
+    color: black; /* Invert the colors on hover */
+  }
+  

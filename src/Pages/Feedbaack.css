@@ -1,0 +1,12 @@
+.hoverButton {
+    background-color: black;
+    color: white; /* Ensure the text color is white */
+    border: 2px solid white;
+    transition: all 0.3s ease;
+  }
+  
+  .hoverButton:hover {
+    background-color: white;
+    color: black; /* Invert the colors on hover */
+  }
+  

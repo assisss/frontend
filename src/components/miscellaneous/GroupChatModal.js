@@ -12,6 +12,8 @@ import {
   Input,
   useToast,
   Box,
+  VStack,
+  Spinner,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
@@ -21,7 +23,7 @@ import UserListItem from "../UserAvatar/UserListItem";
 
 const GroupChatModal = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [groupChatName, setGroupChatName] = useState();
+  const [groupChatName, setGroupChatName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -59,18 +61,18 @@ const GroupChatModal = ({ children }) => {
         },
       };
       const { data } = await axios.get(`/api/user?search=${search}`, config);
-      console.log(data);
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
       toast({
-        title: "Error Occured!",
+        title: "Error Occurred!",
         description: "Failed to Load the Search Results",
         status: "error",
         duration: 5000,
         isClosable: true,
         position: "bottom-left",
       });
+      setLoading(false);
     }
   };
 
@@ -79,9 +81,9 @@ const GroupChatModal = ({ children }) => {
   };
 
   const handleSubmit = async () => {
-    if (!groupChatName || !selectedUsers) {
+    if (!groupChatName || !selectedUsers.length) {
       toast({
-        title: "Please fill all the feilds",
+        title: "Please fill all the fields",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -129,34 +131,59 @@ const GroupChatModal = ({ children }) => {
     <>
       <span onClick={onOpen}>{children}</span>
 
-      <Modal onClose={onClose} isOpen={isOpen} isCentered>
+      <Modal onClose={onClose} isOpen={isOpen} isCentered size="lg">
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent
+          bg="black"
+          color="white"
+          borderColor="gray.700"
+          borderWidth="1px"
+          maxH="80vh"
+          d="flex"
+          flexDirection="column"
+        >
           <ModalHeader
             fontSize="35px"
             fontFamily="Work sans"
             d="flex"
             justifyContent="center"
+            bg="gray.800"
+            position="sticky"
+            top="0"
+            zIndex="docked"
           >
             Create Group Chat
           </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody d="flex" flexDir="column" alignItems="center">
-            <FormControl>
+          <ModalCloseButton color="white" />
+          <ModalBody
+            d="flex"
+            flexDirection="column"
+            alignItems="center"
+            bg="gray.900"
+            overflowY="auto"
+            flex="1"
+            p={4}
+          >
+            <FormControl mb={3}>
               <Input
                 placeholder="Chat Name"
                 mb={3}
+                bg="gray.700"
+                color="white"
+                borderColor="gray.600"
                 onChange={(e) => setGroupChatName(e.target.value)}
               />
             </FormControl>
-            <FormControl>
+            <FormControl mb={3}>
               <Input
                 placeholder="Add Users eg: John, Piyush, Jane"
-                mb={1}
+                bg="gray.700"
+                color="white"
+                borderColor="gray.600"
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </FormControl>
-            <Box w="100%" d="flex" flexWrap="wrap">
+            <Box w="100%" d="flex" flexWrap="wrap" mb={3}>
               {selectedUsers.map((u) => (
                 <UserBadgeItem
                   key={u._id}
@@ -166,22 +193,32 @@ const GroupChatModal = ({ children }) => {
               ))}
             </Box>
             {loading ? (
-              // <ChatLoading />
-              <div>Loading...</div>
+              <Spinner size="lg" />
             ) : (
-              searchResult
-                ?.slice(0, 4)
-                .map((user) => (
+              <Box
+                w="100%"
+                maxH="50vh" // Set a max height for the scrollable area
+                overflowY="auto"
+                d="flex"
+                flexDirection="column"
+              >
+                {searchResult?.slice(0, 4).map((user) => (
                   <UserListItem
                     key={user._id}
                     user={user}
                     handleFunction={() => handleGroup(user)}
                   />
-                ))
+                ))}
+              </Box>
             )}
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleSubmit} colorScheme="blue">
+          <ModalFooter
+            bg="gray.800"
+            d="flex"
+            justifyContent="flex-end"
+            p={4}
+          >
+            <Button onClick={handleSubmit} colorScheme="teal" variant="solid">
               Create Chat
             </Button>
           </ModalFooter>

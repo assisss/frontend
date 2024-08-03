@@ -1,61 +1,50 @@
-import {
-  Box,
-  Container,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-} from "@chakra-ui/react";
-import { useEffect } from "react";
-import { useHistory } from "react-router";
-import Login from "../components/authentication/Login";
-import SignUp from "../components/authentication/SignUp";
- 
+import { Box, Button, Container, Flex, Text } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import React from 'react';
+import './Homepage.css'; // Import the CSS file
 
 function Homepage() {
-  const history = useHistory();
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("userInfo"));
-
-    if (user) history.push("/chats");
-  }, [history]);
-
   return (
-    <Container maxW="xl" centerContent>
-      <Box
-        d="flex"
-        justifyContent="center"
-        p={3}
-        bg="white"
-        w="100%"
-        m="40px 0 15px 0"
-        borderRadius="lg"
-        borderWidth="1px"
-      >
-        <Text fontSize="4xl" fontFamily="Work sans" d="flex">
-          WEB_CHAT_APP
+    <Box
+      height="100vh"
+      width="100vw"
+      bg="black"
+      color="white"
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      padding="2rem"
+      backgroundPosition="center"
+      backgroundSize="cover"
+      backgroundRepeat="no-repeat"
+    >
+      <Flex as="nav" justifyContent="space-between" width="100%" position="absolute" top="0" padding="1rem 2rem">
+        <Text fontSize="2xl" fontWeight="bold">WEB_CHAT_APP</Text>
+        <Flex>
+          <Link to="/login">
+            <Button variant="outline" className="hoverButton" mr={4} textColor="white">
+              Login
+            </Button>
+          </Link>
+          <Link to="/signup">
+            <Button variant="outline" className="hoverButton" mr={4} textColor="white">
+              Sign up
+            </Button>
+          </Link>
+          <Link to="/feedback">
+            <Button variant="outline" className="hoverButton" textColor="white">
+              Give Us Feedback
+            </Button>
+          </Link>
+        </Flex>
+      </Flex>
+      <Container centerContent alignItems="flex-start" textAlign="left" maxWidth="80%">
+        <Text fontSize="4xl" fontWeight="bold" mb={4} className="typing">
+          Say Hii, To your family & friends!!!!
         </Text>
-      </Box>
-      <Box bg="white" w="100%" p={4} borderRadius="lg" borderWidth="1px">
-        <Tabs isFitted variant="soft-rounded">
-          <TabList mb="1em">
-            <Tab>Login</Tab>
-            <Tab>Sign Up</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-               <Login/>
-            </TabPanel>
-            <TabPanel>
-             <SignUp/>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }
 

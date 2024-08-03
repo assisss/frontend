@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { ViewIcon } from "@chakra-ui/icons";
 import {
   Modal,
@@ -16,8 +16,7 @@ import {
 } from "@chakra-ui/react";
 
 const ProfileModal = ({ user, children }) => {
-  const {isOpen , onOpen , onClose} = useDisclosure();
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
@@ -28,7 +27,7 @@ const ProfileModal = ({ user, children }) => {
       )}
       <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent h="410px">
+        <ModalContent bg="black" color="white" borderColor="gray.700" borderWidth="1px">
           <ModalHeader
             fontSize="40px"
             fontFamily="Work sans"
@@ -42,13 +41,14 @@ const ProfileModal = ({ user, children }) => {
             d="flex"
             flexDir="column"
             alignItems="center"
-            justifyContent="space-between"
+            justifyContent="center"
           >
             <Image
               borderRadius="full"
               boxSize="150px"
               src={user.pic}
               alt={user.name}
+              mb={4} // Add margin bottom to space out from the email
             />
             <Text
               fontSize={{ base: "28px", md: "30px" }}
@@ -58,12 +58,12 @@ const ProfileModal = ({ user, children }) => {
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose}>Close</Button>
+            <Button onClick={onClose} colorScheme="teal">Close</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default ProfileModal
+export default ProfileModal;

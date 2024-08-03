@@ -1,5 +1,5 @@
-import { Box, Button, Tooltip, Text ,Input, useToast} from '@chakra-ui/react';
-import axios from 'axios'
+import { Box, Button, Tooltip, Text, Input, useToast, Spinner } from '@chakra-ui/react';
+import axios from 'axios';
 import {
   Menu,
   MenuButton,
@@ -15,9 +15,8 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-} from '@chakra-ui/react'
-import { Toast } from '@chakra-ui/react';
-import { BellIcon, ChevronDownIcon,CheckIcon } from '@chakra-ui/icons';
+} from '@chakra-ui/react';
+import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { Avatar } from '@chakra-ui/avatar';
 import UserListItem from "../UserAvatar/UserListItem";
 import { useState } from 'react';
@@ -27,33 +26,31 @@ import ProfileModal from './ProfileModal';
 import { useDisclosure } from '@chakra-ui/react';
 import { useHistory } from 'react-router-dom';
 import ChatLoading from '../ChatLoading';
-import { Spinner } from "@chakra-ui/spinner";
 import { getSender } from '../../config/ChatLogics';
 import { IoIosNotifications } from "react-icons/io";
 import { MdNotificationAdd } from "react-icons/md";
 
-
-
 function SideDrawer() {
-
   const [search, setSearch] = useState("");
-   
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
 
-  const { user,setSelectedChat,chats,setChats,notification,setNotification} = ChatState();
+  const { user, setUser, setSelectedChat, chats, setChats, notification, setNotification } = ChatState();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const history = useHistory();
+  const toast = useToast();
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
+    localStorage.clear();
+    setUser(null);
+    setChats([]);
+    setNotification([]);
     history.push("/");
   };
 
-  // to search the ele 
-  const toast = useToast();
-  const handleSearch = async()=>{
+  const handleSearch = async () => {
     if (!search) {
       toast({
         title: "Please Enter something in search",
@@ -68,16 +65,15 @@ function SideDrawer() {
       setLoading(true);
 
       const config = {
-        headers:{
-          Authorization:`Bearer ${user.token}`,
+        headers: {
+          Authorization: `Bearer ${user.token}`,
         },
       };
 
-      const data = await axios.get(`/api/user?search=${search}`,config);
+      const data = await axios.get(`/api/user?search=${search}`, config);
 
       setLoading(false);
       setSearchResult(data.data);
-      // console.log(searchResult);
 
     } catch (error) {
       toast({
@@ -91,52 +87,50 @@ function SideDrawer() {
     }
   }
 
-  const accessChat = async(userId)=>{
-      try {
+  const accessChat = async (userId) => {
+    try {
+      setLoading(true);
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
 
-        setLoading(true);
-        const config = {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
+      const { data } = await axios.post("/api/chat", { userId }, config);
 
-        const {data} = await axios.post("/api/chat",{userId},config);
+      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
 
-        if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      setSelectedChat(data);
+      setLoading(false);
 
-        setSelectedChat(data);
-        setLoading(false);
-        
-      } catch (error) {
-        toast({
-          title: "Error fetching the chat",
-          description: error.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
-        });
-      }
+    } catch (error) {
+      toast({
+        title: "Error fetching the chat",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
   }
-  
-  
+
   return (
     <>
       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        bg="teal.500"
+        bg="black"
         color="white"
         w="100%"
         p="5px 10px"
-        borderWidth="5px"
-        borderColor="teal.700"
+        borderWidth="1px"
+        borderColor="gray.700"
       >
         <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
-          <Button variant="ghost"  onClick={onOpen}color="white" _hover={{ bg: "teal.600" }}>
+          <Button variant="ghost" onClick={onOpen} color="white" _hover={{ bg: "gray.700" }}>
             <i className="fas fa-search"></i>
             <Text display={{ base: "none", md: "flex" }} px={4}>
               Search User
@@ -148,15 +142,16 @@ function SideDrawer() {
         </Text>
         <Box display="flex" alignItems="center">
           <Menu>
-            <MenuButton>
-              {!notification.length  && <IoIosNotifications size={23} />  }
-              { notification.length > 0  && <MdNotificationAdd size={23} color='orange'/>}
+            <MenuButton bg="black" color="white" borderColor="gray.700">
+              {!notification.length && <IoIosNotifications size={23} color="white" />}
+              {notification.length > 0 && <MdNotificationAdd size={23} color='orange' />}
             </MenuButton>
-            <MenuList  textColor="black"pl={2}>
+            <MenuList bg="black" color="white" borderColor="gray.700" className='bg-black text-white'>
               {!notification.length && "No New Messages"}
 
               {notification.map((notif) => (
                 <MenuItem
+                  bg="black"
                   key={notif._id}
                   onClick={() => {
                     setSelectedChat(notif.chat);
@@ -171,34 +166,36 @@ function SideDrawer() {
             </MenuList>
           </Menu>
           <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="teal">
-              <Avatar size="sm" cursor="pointer" name={user.name} bg="teal.700" />
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="black" variant="outline">
+              <Avatar size="sm" cursor="pointer" name={user.name} bg="gray.700" />
             </MenuButton>
-            <MenuList bg="white" color="black">
+            <MenuList bg="black" color="white" borderColor="gray.700">
               <ProfileModal user={user}>
-                <MenuItem>My Profile</MenuItem>
+                <MenuItem bg="black">My Profile</MenuItem>
               </ProfileModal>
               <MenuDivider />
-              <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+              <MenuItem onClick={logoutHandler} bg="black">Logout</MenuItem>
             </MenuList>
           </Menu>
         </Box>
       </Box>
 
       <Drawer placement='left' onClose={onClose} isOpen={isOpen}>
-        <DrawerOverlay/>
-        <DrawerContent>
-        <DrawerHeader>search users </DrawerHeader>
+        <DrawerOverlay />
+        <DrawerContent bg="black" color="white">
+          <DrawerHeader borderBottomWidth="1px">Search Users</DrawerHeader>
           <DrawerBody>
-
             <Box display="flex" mb={4} alignItems="center">
               <Input
                 placeholder="Search by name"
                 mr={2}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                bg="gray.700"
+                color="white"
+                _placeholder={{ color: "gray.400" }}
               />
-              <Button onClick={handleSearch}>Go</Button>
+              <Button onClick={handleSearch} colorScheme="teal">Go</Button>
             </Box>
 
             {loading ? (
@@ -218,10 +215,9 @@ function SideDrawer() {
                 )}
               </Box>
             )}
-             {loadingChat && <Spinner ml="auto" d="flex" />}
+            {loadingChat && <Spinner ml="auto" d="flex" />}
           </DrawerBody>
         </DrawerContent>
-
       </Drawer>
     </>
   );

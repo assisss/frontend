@@ -13,18 +13,18 @@ const Signup = () => {
   const toast = useToast();
   const history = useHistory();
 
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [confirmpassword, setConfirmpassword] = useState();
-  const [password, setPassword] = useState();
-  const [pic, setPic] = useState();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [confirmpassword, setConfirmpassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [pic, setPic] = useState("");
   const [picLoading, setPicLoading] = useState(false);
 
   const submitHandler = async () => {
     setPicLoading(true);
     if (!name || !email || !password || !confirmpassword) {
       toast({
-        title: "Please Fill all the Feilds",
+        title: "Please Fill all the Fields",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -42,46 +42,47 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
+      setPicLoading(false);
       return;
     }
 
-      console.log(name,email,password,pic);
+    console.log(name, email, password, pic);
 
-      try {
-        const config ={
-          headers:{
-            "Content-type":"application/json",
-          },
-        };
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
 
-        const data =  await axios.post("/api/user",{name,email,password,pic},config);
+      const { data } = await axios.post("/api/user", { name, email, password, pic }, config);
 
-        console.log(data);
+      console.log(data);
 
-        toast({
-          title: "Registration Successful",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
+      toast({
+        title: "Registration Successful",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
 
-        localStorage.setItem("userInfo",JSON.stringify(data));
-        setPicLoading(false);
-        history.push("/chats");
+      localStorage.clear(); // Clear all local storage
+      setPicLoading(false);
+      window.location.reload(); // Reload the page to reset state
+      history.push("/login"); // Redirect to login page
 
-      } catch (error) {
-        toast({
-          title: "Error Occured!",
-          description: error.response.data.message,
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom",
-        });
-        setPicLoading(false);
-      }
-
+    } catch (error) {
+      toast({
+        title: "Error Occurred!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setPicLoading(false);
+    }
   };
 
   const postDetails = (pics) => {
@@ -94,6 +95,7 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
+      setPicLoading(false);
       return;
     }
     console.log(pics);
@@ -130,7 +132,7 @@ const Signup = () => {
   };
 
   return (
-    <VStack spacing="5px">
+    <VStack spacing="5px" color="white">
       <FormControl id="first-name" isRequired>
         <FormLabel>Name</FormLabel>
         <Input
@@ -161,7 +163,7 @@ const Signup = () => {
           </InputRightElement>
         </InputGroup>
       </FormControl>
-      <FormControl id="password" isRequired>
+      <FormControl id="confirmpassword" isRequired>
         <FormLabel>Confirm Password</FormLabel>
         <InputGroup size="md">
           <Input
